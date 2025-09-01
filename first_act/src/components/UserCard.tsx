@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types/user';
-import { Edit, Trash2, User as UserIcon, Calendar, Eye, EyeOff } from 'lucide-react';
+import { Edit, Trash2, User as UserIcon, Calendar, Eye, EyeOff, Hash } from 'lucide-react';
 
 interface UserCardProps {
   user: User;
@@ -20,9 +20,21 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
     return '*'.repeat(password.length);
   };
 
-  const safeUsername = user.username || 'Unknown User';
-  const safePassword = user.password || '';
-  const safeId = user.id || 'N/A';
+  const safeUsername = user?.username || 'Unknown User';
+  const safePassword = user?.password || '';
+  const safeId = user?.id || 'N/A';
+  const safeCode = user?.code;
+  const safeCreatedAt = user?.createdAt;
+
+  if (!user) {
+    return (
+      <div className="bg-gray-900/50 border border-red-800 rounded-lg p-6">
+        <div className="text-center text-red-400">
+          <p>Error: User data not available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 hover:border-gray-700 transition-colors">
@@ -50,7 +62,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            onClick={() => onDelete(user.id)}
+            onClick={() => onDelete(safeId)}
             className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-lg transition-colors"
             title="Delete user"
           >
@@ -65,21 +77,31 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
           <span className="text-gray-300">Username:</span>
           <span className="ml-2 font-mono">{safeUsername}</span>
         </div>
-        
-        <div className="flex items-center text-gray-400">
-          <div className="flex items-center">
-            {showPassword ? (
-              <EyeOff className="w-4 h-4 mr-2" />
-            ) : (
-              <Eye className="w-4 h-4 mr-2" />
-            )}
-            <span className="text-gray-300">Password:</span>
+
+        {/* Show code if available */}
+        {safeCode && (
+          <div className="flex items-center text-gray-400">
+            <Hash className="w-4 h-4 mr-2" />
+            <span className="text-gray-300">Code:</span>
+            <span className="ml-2 font-mono text-orange-400">{safeCode}</span>
           </div>
-          <div className="ml-2 flex items-center">
-            <span className="font-mono">
-              {showPassword ? safePassword || 'No password' : maskPassword(safePassword)}
-            </span>
-            {safePassword && (
+        )}
+        
+        {/* Only show password if it exists */}
+        {safePassword && (
+          <div className="flex items-center text-gray-400">
+            <div className="flex items-center">
+              {showPassword ? (
+                <EyeOff className="w-4 h-4 mr-2" />
+              ) : (
+                <Eye className="w-4 h-4 mr-2" />
+              )}
+              <span className="text-gray-300">Password:</span>
+            </div>
+            <div className="ml-2 flex items-center">
+              <span className="font-mono">
+                {showPassword ? safePassword : maskPassword(safePassword)}
+              </span>
               <button
                 onClick={togglePasswordVisibility}
                 className="ml-2 text-gray-400 hover:text-gray-300 transition-colors"
@@ -91,15 +113,15 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
                   <Eye className="w-3 h-3" />
                 )}
               </button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {user.createdAt && (
+        {safeCreatedAt && (
           <div className="flex items-center text-gray-400">
             <Calendar className="w-4 h-4 mr-2" />
             <span className="text-gray-300">Created:</span>
-            <span className="ml-2">{new Date(user.createdAt).toLocaleDateString()}</span>
+            <span className="ml-2">{new Date(safeCreatedAt).toLocaleDateString()}</span>
           </div>
         )}
       </div>
