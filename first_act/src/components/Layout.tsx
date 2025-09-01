@@ -1,14 +1,38 @@
 import React from 'react';
-import { Search, Plus, Github, Twitter, Linkedin } from 'lucide-react';
+import { Search, Plus, Github, Twitter, Linkedin, RefreshCw } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
   onSearch: (query: string) => void;
   onAddUser: () => void;
+  onRefresh?: () => void;
   searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, onSearch, onAddUser, searchQuery }) => {
+const Layout: React.FC<LayoutProps> = ({ children, onSearch, onAddUser, onRefresh, searchQuery, setSearchQuery }) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); 
+    if (searchQuery.trim()) {
+      onSearch(searchQuery);
+    }
+  };
+
+  const handleSearchClick = () => {
+    if (searchQuery.trim()) {
+      onSearch(searchQuery);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); 
+      if (searchQuery.trim()) {
+        onSearch(searchQuery);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
@@ -17,9 +41,9 @@ const Layout: React.FC<LayoutProps> = ({ children, onSearch, onAddUser, searchQu
             <div className="flex items-center space-x-8">
               <h1 className="text-xl font-bold text-white">USER MANAGER</h1>
               <nav className="hidden md:flex space-x-6">
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">Dashboard</a>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">Users</a>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">Settings</a>
+                <button className="text-gray-300 hover:text-white transition-colors">Dashboard</button>
+                <button className="text-gray-300 hover:text-white transition-colors">Users</button>
+                <button className="text-gray-300 hover:text-white transition-colors">Settings</button>
               </nav>
             </div>
             
@@ -43,25 +67,43 @@ const Layout: React.FC<LayoutProps> = ({ children, onSearch, onAddUser, searchQu
             Create, update, and manage user accounts with a beautiful interface
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search 
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 cursor-pointer" 
+                onClick={handleSearchClick}
+              />
               <input
                 type="text"
                 placeholder="Search users..."
                 value={searchQuery}
-                onChange={(e) => onSearch(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white placeholder-gray-400"
               />
             </div>
-            <button
-              onClick={onAddUser}
-              className="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add User
-            </button>
-          </div>
+            <div className="flex gap-2">
+              {onRefresh && (
+                <button
+                  type="button"
+                  onClick={onRefresh}
+                  className="inline-flex items-center px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                  title="Refresh users from server"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  <span className="ml-2 hidden sm:inline">Refresh</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onAddUser}
+                className="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Add User
+              </button>
+            </div>
+          </form>
         </div>
 
         {children}

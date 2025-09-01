@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, CreateUserRequest, UpdateUserRequest } from '../types/user';
+import { User, CreateUserRequest, UpdateUserRequest, GetUsersResponse } from '../types/user';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_LINK || process.env.API_LINK;
 
@@ -10,8 +10,16 @@ const api = axios.create({
   },
 });
 
+const isCode = (query: string): boolean => {
+  return query.length === 6 && /^[A-Z0-9]+$/.test(query);
+};
+
+const isId = (query: string): boolean => {
+  return query.length === 24 && /^[0-9a-f]+$/.test(query);
+};
+
 export const userService = {
-  getAllUsers: async (): Promise<User[]> => {
+  getAllUsers: async (): Promise<GetUsersResponse> => {
     try {
       const response = await api.get('/users');
       return response.data;
@@ -43,10 +51,8 @@ export const userService = {
 
   updateUser: async (userData: UpdateUserRequest): Promise<User> => {
     try {
-      const response = await api.patch(`/users/${userData.id}`, {
-        username: userData.username,
-        password: userData.password
-      });
+      const payload = { username: userData.username };
+      const response = await api.patch(`/users/${userData.id}`, payload);
       return response.data;
     } catch (error) {
       console.error('Error updating user:', error);
@@ -63,9 +69,14 @@ export const userService = {
     }
   },
 
-  searchUsers: async (query: string): Promise<User[]> => {
+  searchUsers: async (query: string): Promise<GetUsersResponse> => {
     try {
-      const response = await api.get(`/users?search=${encodeURIComponent(query)}`);
+      let response;
+      if (isCode(query) || isId(query)) {
+        response = await api.get(`/users/${encodeURIComponent(query)}`);
+      } else {
+        response = await api.get(`/users?search=${encodeURIComponent(query)}`);
+      }
       return response.data;
     } catch (error) {
       console.error('Error searching users:', error);

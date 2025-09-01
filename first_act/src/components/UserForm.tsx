@@ -10,12 +10,12 @@ interface UserFormProps {
   loading?: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  editingUser, 
-  loading = false 
+const UserForm: React.FC<UserFormProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  editingUser,
+  loading = false,
 }) => {
   const [formData, setFormData] = useState<CreateUserRequest>({
     username: '',
@@ -29,7 +29,7 @@ const UserForm: React.FC<UserFormProps> = ({
     if (editingUser) {
       setFormData({
         username: editingUser.username,
-        password: editingUser.password,
+        password: '',
       });
     } else {
       setFormData({
@@ -43,20 +43,23 @@ const UserForm: React.FC<UserFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.username.trim() || !formData.password.trim()) {
-      setFormError('Username and password are required');
+
+    if (!formData.username.trim()) {
+      setFormError('Username is required');
+      return;
+    }
+    if (!editingUser && !formData.password.trim()) {
+      setFormError('Password is required for new users');
       return;
     }
 
     try {
       setIsSubmitting(true);
       setFormError(null);
-      await onSubmit(formData);
-      // Form will be closed by parent component on success
+      const payload = editingUser ? { username: formData.username } : formData;
+      await onSubmit(payload as CreateUserRequest);
     } catch (error: any) {
-      // Handle form-specific errors
-      const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
+      const errorMessage = error.message || 'An error occurred';
       setFormError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -113,35 +116,37 @@ const UserForm: React.FC<UserFormProps> = ({
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Password *
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                disabled={isSubmitting || loading}
-                className="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Enter password"
-              />
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                disabled={isSubmitting || loading}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
+          {!editingUser && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Password *
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  disabled={isSubmitting || loading}
+                  className="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder="Enter password"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  disabled={isSubmitting || loading}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex space-x-3 pt-4">
             <button
