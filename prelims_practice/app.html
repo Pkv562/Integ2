@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prelims</title>
+</head>
+<body>
+    <h1>Prelims Practice</h1>
+
+    <div id="searchBar">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <button id="searchBtn" name="click">Search</button>
+        <button id="deleteBtn" name="click">Delete</button>
+        <button id="searchAllBtn" name="click">Search All</button>
+    </div>
+
+    <div id="searchResult" class="result-box">
+        <p id="userID"></p>
+        <p id="userName"></p>
+        <p id="userCode"></p>
+    </div>
+    <p id="searchMessage"></p>
+
+    <br><br>
+
+    <form id="userForm">
+        <label for="username">username: </label>
+        <input type="text" id="username" name="username" required>
+        <br><br>
+        <label for="password">password: </label>
+        <input type="password" id="password" name="password" required>
+        <br><br>
+        
+        <button id="submitBtn" type="submit">submit</button>
+
+    </form>
+    <p id="postResponse"></p>
+
+    <br><br>
+
+    <form id="updateForm">
+        <input type="text" id="updateInput" placeholder="Search...">
+        <br><br>
+        <label for="username">username: </label>
+        <input type="text" id="updateUsername" name="username" >
+        <br><br>
+        <label for="password">password: </label>
+        <input type="password" id="updatePassword" name="password" >
+        <br><br>
+        
+        <button id="updateBtn" type="submit">Update</button>
+
+    </form>
+    <p id="updateResponse"></p>
+
+    <script src="controller.js"></script>
+</body>
+</html>
