@@ -23,7 +23,8 @@ export default function LoginPage() {
 
     try {
       const hasAuthKey = showAuthKey && formData.authKey.trim().length > 0
-      const payload: Record<string, any> = {
+      type LoginPayload = { username: string; password: string; authKey?: string }
+      const payload: LoginPayload = {
         username: formData.username,
         password: formData.password
       }
@@ -186,7 +187,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-medium">
                 Sign up
               </Link>

@@ -22,7 +22,8 @@ export default function SignupPage() {
 
     try {
       const hasAge = showAgeInput && formData.age.trim().length > 0
-      const payload: Record<string, any> = {
+      type SignupPayload = { username: string; password: string; age?: number }
+      const payload: SignupPayload = {
         username: formData.username,
         password: formData.password
       }
@@ -48,8 +49,8 @@ export default function SignupPage() {
 
       // Second attempt with age included
       const message = typeof data === 'string' ? data : data.message
-      const id = (data as any)?.id
-      const code = (data as any)?.code
+      const id = (data as { id?: string })?.id
+      const code = (data as { code?: string })?.code
 
       // Store message to show on login page
       if (message) {

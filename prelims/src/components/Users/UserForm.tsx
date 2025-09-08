@@ -64,21 +64,22 @@ export default function UserForm({ user, onSubmit, onCancel, isLoading }: UserFo
       return
     }
 
-    const submitData: any = { ...formData }
+    type Combined = Partial<CreateUserData & UpdateUserData> & { password?: string; username?: string }
+    const submitData: Combined = { ...formData }
     if (user) {
       // Update user - remove password if empty
       if (!submitData.password) {
-        delete (submitData as any).password
+        delete submitData.password
       }
       // If editing only username, trim payload to username only
       if (submitData.username && !submitData.firstName && !submitData.lastName && !submitData.email) {
-        Object.keys(submitData).forEach((key) => {
-          if (!['username'].includes(key)) delete submitData[key]
+        (Object.keys(submitData) as Array<keyof Combined>).forEach((key) => {
+          if (key !== 'username') delete submitData[key]
         })
       }
     }
 
-    onSubmit(submitData)
+    onSubmit(submitData as CreateUserData | UpdateUserData)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

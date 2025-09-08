@@ -26,9 +26,19 @@ export default function UserTable({ users, onEdit, onDelete, onStatusChange }: U
   const sortedUsers = [...users].sort((a, b) => {
     const aValue = a[sortField]
     const bValue = b[sortField]
-    
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+
+    const normalize = (val: unknown): string | number => {
+      if (val === undefined || val === null) return Number.NEGATIVE_INFINITY
+      if (typeof val === 'number') return val
+      if (val instanceof Date) return val.getTime()
+      return String(val).toLowerCase()
+    }
+
+    const aComp = normalize(aValue)
+    const bComp = normalize(bValue)
+
+    if (aComp < bComp) return sortDirection === 'asc' ? -1 : 1
+    if (aComp > bComp) return sortDirection === 'asc' ? 1 : -1
     return 0
   })
 
@@ -143,7 +153,7 @@ export default function UserTable({ users, onEdit, onDelete, onStatusChange }: U
                   <div className="flex items-center justify-end space-x-2">
                     <select
                       value={user.status}
-                      onChange={(e) => onStatusChange(user.id, e.target.value as any)}
+                      onChange={(e) => onStatusChange(user.id, e.target.value as 'active' | 'inactive' | 'suspended')}
                       className="text-xs bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white"
                     >
                       <option value="active">Active</option>
