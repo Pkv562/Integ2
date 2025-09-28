@@ -28,11 +28,11 @@ const getStudentByID = async (id) => {
 
 const createStudent = async (studentData) => {
 
+    const id = await generateUniqueStudentID();
     const studentWithID = {
         ...studentData,
-        id: generateUniqueStudentID()
-    }
-
+        id
+    };
     const newStudent = new model.Student(studentWithID);
     return await newStudent.save();
 };
